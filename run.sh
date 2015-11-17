@@ -19,7 +19,10 @@ is_zero ${ERLANG_NODE} \
 if (is_true ${ERLANG_NODE}); then
     export ERLANG_NODE="ejabberd@${nodename}"
 else
+    #export ERLANG_NODE="${ERLANG_NODE}@${nodename}"
     export ERLANG_NODE="${ERLANG_NODE}@${nodename}"
+    echo "nodename=${nodename}"
+    echo "ERLANG_NODE=${ERLANG_NODE}"
 fi
 
 
@@ -73,18 +76,26 @@ _trap() {
 # Catch signals and shutdown ejabberd
 trap _trap SIGTERM SIGINT
 
+echo "EJABBERDCTL=${EJABBERDCTL}"
+
 ## run ejabberd
 case "$@" in
     start)
+        echo "DBG: pre_scripts"
         pre_scripts
         tail -F ${LOGDIR}/crash.log \
                 ${LOGDIR}/error.log \
                 ${LOGDIR}/erlang.log &
-        echo "Starting ejabberd..."
+        echo "DBG: ${EJABBERDCTL} start"
         exec ${EJABBERDCTL} "live" &
+        #exec ${EJABBERDCTL} "start" &
         child=$!
+        echo "DBG: ${EJABBERDCTL} started"
         ${EJABBERDCTL} "started"
+        sleep 30
+        echo "DBG: post_scripts"
         post_scripts
+        echo "DBG: wait $child"
         wait $child
     ;;
     live)

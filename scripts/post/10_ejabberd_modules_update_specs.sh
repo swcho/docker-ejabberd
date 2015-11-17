@@ -11,6 +11,7 @@ source "${EJABBERD_HOME}/scripts/lib/functions.sh"
 
 run_modules_update_specs() {
     echo -n 'Updating module specs... '
+    echo "${EJABBERDCTL} modules_update_specs"
     ${EJABBERDCTL} modules_update_specs
 }
 
